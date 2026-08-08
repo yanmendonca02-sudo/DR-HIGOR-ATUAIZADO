@@ -6,3 +6,6 @@ src/convex/_generated
 # Estado local do Freebuff (não vai para o repositório)
 .freebuff/desktop-v2.db*
 .freebuff/*.log
+
+.vercel
+.env*

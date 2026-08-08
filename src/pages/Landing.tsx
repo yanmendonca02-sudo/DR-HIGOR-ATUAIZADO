@@ -626,9 +626,9 @@ function Hero() {
 
             <motion.div variants={heroItem}>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-brown/65 sm:text-lg">
-                Harmonização glútea de alta performance em Icaraí, Niterói. Mais
-                que volume: arquitetura, proporção e naturalidade — desenhadas
-                para o seu corpo.
+                Harmonização glútea de alta performance — atendimento presencial
+                em Icaraí, Niterói e consultoria online. Mais que volume:
+                arquitetura, proporção e naturalidade desenhadas para o seu corpo.
               </p>
             </motion.div>
 
@@ -667,7 +667,7 @@ function Hero() {
                 </span>
                 <span className="flex items-center gap-2">
                   <MapPin className="size-4 text-terracotta" />
-                  Icaraí · Niterói
+                  Presencial e Online
                 </span>
                 <span className="flex items-center gap-2">
                   <Clock className="size-4 text-terracotta" />
@@ -1692,7 +1692,7 @@ function Footer() {
             <ul className="mt-5 space-y-4 text-sm text-cream/60">
               <li className="flex items-start gap-3">
                 <MapPin className="mt-0.5 size-4 shrink-0 text-gold" />
-                Rua Miguel de Frias, 150 — Icaraí, Niterói/RJ
+                Atendimento presencial e online
               </li>
               <li className="flex items-start gap-3">
                 <Clock className="mt-0.5 size-4 shrink-0 text-gold" />
