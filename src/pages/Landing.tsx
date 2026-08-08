@@ -903,6 +903,19 @@ const SERVICES = [
   },
 ];
 
+const OUTROS_PROCEDIMENTOS = [
+  "Preenchedores",
+  "Lipoenzimática",
+  "Peeling",
+  "Botox",
+  "Fios de PDO",
+  "Ativos para performance corporal",
+  "Longevidade",
+  "Saciedade",
+  "Emagrecimento",
+  "Hipertrofia",
+];
+
 function Services() {
   return (
     <section id="servicos" className="scroll-mt-24 bg-cream py-24 sm:py-32">
@@ -975,6 +988,29 @@ function Services() {
             </Reveal>
           ))}
         </div>
+
+        {/* Outros procedimentos */}
+        <Reveal delay={0.15}>
+          <div className="mt-16 border-t border-brown/10 pt-12 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-gold-strong">
+              Também atendemos
+            </p>
+            <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-brown/55">
+              Nosso destaque é a Harmonização Glútea — protocolo assinatura do
+              Dr. Higor, do diagnóstico métrico ao resultado natural.
+            </p>
+            <div className="mx-auto mt-8 flex max-w-3xl flex-wrap items-center justify-center gap-3">
+              {OUTROS_PROCEDIMENTOS.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-brown/15 bg-beige px-5 py-2 text-sm font-medium text-brown/75 transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/60 hover:bg-peach hover:text-brown"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
