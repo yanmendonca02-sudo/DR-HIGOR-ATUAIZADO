@@ -983,161 +983,187 @@ function Services() {
 /*  Resultados — Prova Social                                          */
 /* ------------------------------------------------------------------ */
 
-const REELS = [
+const ANTES_DEPOIS_SLIDES = [
   {
-    href: "https://www.instagram.com/reel/DatdIk2pcRg/",
-    caption: "Depoimento de paciente — Harmonização Glútea",
+    id: 1,
+    antes: "/resultados/facial_antes.png",
+    depois: "/resultados/facial_depois.png",
+    titulo: "Skinbooster · qualidade de pele",
+    legenda: "Pele uniforme e luminosa — protocolo facial",
   },
   {
-    href: "https://www.instagram.com/reel/DabK225pXry/",
-    caption: "Depoimento de paciente — Bioestimulação de colágeno",
+    id: 2,
+    antes: "/resultados/labial_antes.png",
+    depois: "/resultados/labial_antes.png", // TODO: substituir por labial_depois.png quando disponível
+    titulo: "Harmonização labial",
+    legenda: "Volume e contorno natural",
   },
   {
-    href: "https://www.instagram.com/reel/DXHi-JNjPzz/",
-    caption: "Depoimento de paciente — acompanhamento do protocolo",
+    id: 3,
+    antes: "/resultados/lipo_antes.png",
+    depois: "/resultados/lipo_depois.png",
+    titulo: "Lipo enzimática",
+    legenda: "Redução de gordura localizada sem cirurgia",
+  },
+  {
+    id: 4,
+    antes: "/resultados/gluteo_antes.png",
+    depois: "/resultados/gluteo_depois.png",
+    titulo: "Harmonização glútea",
+    legenda: "Projeção e sustentação — resultado natural",
   },
 ];
 
-/* Vídeos nativos em public/ — se existirem, substituem o embed do Instagram.
-   Basta enviar os MP4 com um destes nomes (um conjunto por depoimento). */
-const REEL_VIDEOS = [
-  ["/reel1.mp4", "/video1.mp4", "/depoimento1.mp4", "/1.mp4"],
-  ["/reel2.mp4", "/video2.mp4", "/depoimento2.mp4", "/2.mp4"],
-  ["/reel3.mp4", "/video3.mp4", "/depoimento3.mp4", "/3.mp4"],
-];
+function ResultadosCarrossel() {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
 
-function ReelCard({
-  reel,
-  index,
-}: {
-  reel: (typeof REELS)[number];
-  index: number;
-}) {
-  // Tenta carregar um vídeo nativo em public/. Sem arquivo, usa o player do Instagram.
-  const [videoSrc, setVideoSrc] = useState<string | null>(null);
-
+  // Auto-rotação a cada 5 segundos
   useEffect(() => {
-    let cancelled = false;
-    let i = 0;
-    const candidates = REEL_VIDEOS[index] ?? [];
-    const tryNext = () => {
-      if (cancelled || i >= candidates.length) return;
-      const src = candidates[i];
-      i += 1;
-      const probe = document.createElement("video");
-      probe.preload = "metadata";
-      probe.onloadedmetadata = () => {
-        if (!cancelled) setVideoSrc(src);
-      };
-      probe.onerror = () => tryNext();
-      probe.src = src;
-    };
-    tryNext();
-    return () => {
-      cancelled = true;
-    };
-  }, [index]);
+    if (isPaused || reduceMotion) return;
+    const interval = setInterval(() => {
+      setActiveSlide((current) => (current + 1) % ANTES_DEPOIS_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isPaused, reduceMotion]);
 
-  const embedUrl = reel.href.replace(/\/$/, "") + "/embed/";
+  const goToSlide = (index: number) => {
+    setActiveSlide(index);
+  };
+
+  const goToPrevious = () => {
+    setActiveSlide((current) =>
+      current === 0 ? ANTES_DEPOIS_SLIDES.length - 1 : current - 1
+    );
+  };
+
+  const goToNext = () => {
+    setActiveSlide((current) => (current + 1) % ANTES_DEPOIS_SLIDES.length);
+  };
+
+  const currentSlide = ANTES_DEPOIS_SLIDES[activeSlide];
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-brown/10 bg-beige transition-all duration-500 hover:-translate-y-1 hover:border-gold/60 hover:shadow-[0_24px_60px_-28px_rgb(201_169_97_/_0.55)]">
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-cream">
-        {videoSrc ? (
-          <video
-            key={videoSrc}
-            src={videoSrc}
-            controls
-            playsInline
-            loop
-            muted
-            preload="metadata"
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <iframe
-            src={embedUrl}
-            title={reel.caption}
-            loading="lazy"
-            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-            allowFullScreen
-            className="absolute inset-0 h-full w-full"
-          />
-        )}
-      </div>
-      <div className="flex flex-1 items-center justify-between gap-3 border-t border-brown/10 p-5">
-        <div>
-          <p className="text-sm font-medium leading-snug text-brown/85">
-            {reel.caption}
-          </p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-brown/45">
-            {videoSrc
-              ? "Vídeo nativo · reproduz na página"
-              : "Reproduz na página · toque para assistir"}
-          </p>
-        </div>
-        <a
-          href={reel.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Abrir no Instagram"
-          className="flex size-9 shrink-0 items-center justify-center rounded-full border border-brown/15 text-brown/60 transition-all hover:border-gold hover:text-gold-strong"
-        >
-          <Instagram className="size-4" />
-        </a>
-      </div>
-    </article>
-  );
-}
+    <div
+      className="relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+    >
+      {/* Container do carrossel */}
+      <div className="relative overflow-hidden rounded-2xl">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSlide}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -100 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            className="grid gap-5 md:grid-cols-2"
+            aria-live="polite"
+          >
+            {/* Card ANTES */}
+            <div className="flex flex-col">
+              <img
+                src={currentSlide.antes}
+                alt={`Antes - ${currentSlide.titulo}`}
+                loading="lazy"
+                className="h-auto w-full rounded-2xl object-cover shadow-[0_10px_40px_-12px_rgb(107_83_68_/_0.3)]"
+              />
+            </div>
 
-function BeforeAfter() {
-  return (
-    <div className="grid gap-5 lg:grid-cols-2">
-      {[
-        {
-          label: "Harmonização Glútea Premium",
-          note: "Projeção e sustentação — 6 meses de protocolo",
-        },
-        {
-          label: "Bioestimuladores + definição",
-          note: "Qualidade de pele e contorno — 4 meses",
-        },
-      ].map((item) => (
-        <div
-          key={item.label}
-          className="group rounded-2xl border border-brown/10 bg-beige p-7 transition-colors duration-500 hover:border-gold/50"
+            {/* Card DEPOIS */}
+            <div className="flex flex-col">
+              <img
+                src={currentSlide.depois}
+                alt={`Depois - ${currentSlide.titulo}`}
+                loading="lazy"
+                className="h-auto w-full rounded-2xl object-cover shadow-[0_10px_40px_-12px_rgb(107_83_68_/_0.3)]"
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Setas de navegação */}
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <button
+          type="button"
+          onClick={goToPrevious}
+          aria-label="Slide anterior"
+          className="flex size-10 items-center justify-center rounded-full border border-brown/20 bg-cream text-brown transition-all hover:border-gold hover:bg-gold hover:text-brown-deep"
         >
-          <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.22em]">
-            <span className="text-brown/45">Antes</span>
-            <span className="text-gold-strong">Depois</span>
-          </div>
           <svg
-            viewBox="0 0 300 90"
+            className="size-5"
             fill="none"
-            className="mt-5 h-20 w-full"
-            aria-hidden
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
           >
             <path
-              d="M 12 66 C 78 62, 120 58, 196 40"
-              stroke="rgb(107 83 68 / 0.3)"
-              strokeWidth="1.5"
-              strokeDasharray="4 5"
               strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
             />
-            <path
-              d="M 12 66 C 86 52, 156 30, 288 10"
-              stroke="var(--gold)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
-            <circle cx="288" cy="10" r="3" fill="var(--gold)" />
           </svg>
-          <h4 className="mt-5 text-base font-semibold tracking-tight text-brown">
-            {item.label}
-          </h4>
-          <p className="mt-1 text-[13px] text-brown/55">{item.note}</p>
+        </button>
+
+        {/* Dots indicadores */}
+        <div className="flex items-center gap-2">
+          {ANTES_DEPOIS_SLIDES.map((_, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => goToSlide(index)}
+              aria-label={`Ir para slide ${index + 1}`}
+              aria-current={activeSlide === index ? "true" : undefined}
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                activeSlide === index
+                  ? "w-8 bg-gold"
+                  : "w-2 bg-brown/20 hover:bg-brown/40"
+              )}
+            />
+          ))}
         </div>
-      ))}
+
+        <button
+          type="button"
+          onClick={goToNext}
+          aria-label="Próximo slide"
+          className="flex size-10 items-center justify-center rounded-full border border-brown/20 bg-cream text-brown transition-all hover:border-gold hover:bg-gold hover:text-brown-deep"
+        >
+          <svg
+            className="size-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* Título e legenda do slide atual */}
+      <div className="mt-6 text-center">
+        <h4 className="text-lg font-semibold tracking-tight text-brown">
+          {currentSlide.titulo}
+        </h4>
+        <p className="mt-1.5 text-sm text-brown/60">{currentSlide.legenda}</p>
+      </div>
+
+      {/* Aviso de autorização */}
+      <p className="mt-8 text-center text-xs leading-relaxed text-brown/40">
+        Fotos de pacientes reais, divulgadas com autorização expressa.
+        Resultados individuais podem variar.
+      </p>
     </div>
   );
 }
@@ -1171,7 +1197,7 @@ function Testimonials() {
             <Reveal delay={0.2}>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-brown/60">
                 Protocolos conduzidos com ética, técnica e naturalidade —
-                registrados em vídeo, do diagnóstico à evolução.
+                transformações reais, do diagnóstico à evolução.
               </p>
             </Reveal>
           </div>
@@ -1189,29 +1215,17 @@ function Testimonials() {
           </Reveal>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {REELS.map((reel, i) => (
-            <Reveal
-              key={reel.caption}
-              delay={(i % 3) * 0.08}
-              className="h-full"
-            >
-              <ReelCard reel={reel} index={i} />
-            </Reveal>
-          ))}
-        </div>
-
         <Reveal delay={0.1}>
           <div className="mt-16">
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.28em] text-gold-strong">
               Destaques de transformação
             </h3>
             <p className="mt-2 max-w-xl text-sm leading-relaxed text-brown/55">
-              A evolução é progressiva e mensurável — fotografias, medidas e
-              registros em cada etapa do protocolo.
+              A evolução é progressiva e mensurável — fotografias e registros
+              em cada etapa do protocolo.
             </p>
-            <div className="mt-7">
-              <BeforeAfter />
+            <div className="mt-8">
+              <ResultadosCarrossel />
             </div>
           </div>
         </Reveal>
