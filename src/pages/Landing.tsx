@@ -1003,18 +1003,6 @@ const RESULTADOS_IMAGENS: {
     legenda: "Pele uniforme e luminosa — protocolo facial",
   },
   {
-    src: "/resultados/labial_antes.png",
-    fase: "Antes",
-    titulo: "Harmonização labial",
-    legenda: "Antes do procedimento",
-  },
-  {
-    src: "/resultados/labial_depois.png",
-    fase: "Depois",
-    titulo: "Harmonização labial",
-    legenda: "Volume e contorno natural",
-  },
-  {
     src: "/resultados/lipo_antes.png",
     fase: "Antes",
     titulo: "Lipo enzimática",
@@ -1041,14 +1029,14 @@ const RESULTADOS_IMAGENS: {
   {
     src: "/resultados/depoimento1_antes.jpeg",
     fase: "Antes",
-    titulo: "Depoimento real · acompanhamento completo",
-    legenda: "Registro inicial do acompanhamento",
+    titulo: "Harmonização labial",
+    legenda: "Antes do procedimento — registro inicial",
   },
   {
     src: "/resultados/depoimento1_depois.jpeg",
     fase: "Depois",
-    titulo: "Depoimento real · acompanhamento completo",
-    legenda: "Evolução registrada após o protocolo",
+    titulo: "Harmonização labial",
+    legenda: "Volume e contorno natural — resultado final",
   },
   {
     src: "/resultados/depoimento2_gluteos.jpeg",
