@@ -1,0 +1,17 @@
+{
+  "name": "Dr. Higor Azevedo — Harmonização Glútea",
+  "short_name": "Dr. Higor",
+  "description": "Harmonização glútea de alta performance em Icaraí, Niterói.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#f5f1ed",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
