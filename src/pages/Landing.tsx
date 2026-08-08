@@ -1132,13 +1132,6 @@ function ResultadosCarrossel() {
               </span>
             )}
 
-            {/* Título e legenda sobre gradiente */}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brown-deep/95 via-brown-deep/45 to-transparent px-6 pb-6 pt-20">
-              <h4 className="text-lg font-semibold tracking-tight text-cream">
-                {currentSlide.titulo}
-              </h4>
-              <p className="mt-1 text-sm text-cream/75">{currentSlide.legenda}</p>
-            </div>
           </motion.div>
         </AnimatePresence>
 
@@ -1185,6 +1178,11 @@ function ResultadosCarrossel() {
           </svg>
         </button>
       </div>
+
+      {/* Nome do serviço abaixo da foto — sem sobrepor o texto da imagem */}
+      <h4 className="mt-6 text-center text-xl font-semibold tracking-tight text-brown">
+        {currentSlide.titulo}
+      </h4>
 
       {/* Indicadores + contador */}
       <div className="mt-6 flex items-center justify-center gap-4">
