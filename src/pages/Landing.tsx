@@ -991,67 +991,24 @@ const RESULTADOS_IMAGENS: {
   legenda: string;
 }[] = [
   {
-    src: "/resultados/facial_antes.png",
-    fase: "Antes",
-    titulo: "Skinbooster · qualidade de pele",
-    legenda: "Ponto de partida — textura e viço iniciais",
+    src: "/resultados/preenchimento_labial.png",
+    titulo: "Preenchimento labial",
+    legenda: "Volume e contorno natural — resultado real",
   },
   {
-    src: "/resultados/facial_depois.png",
-    fase: "Depois",
-    titulo: "Skinbooster · qualidade de pele",
-    legenda: "Pele uniforme e luminosa — protocolo facial",
+    src: "/resultados/gluteos.png",
+    titulo: "Harmonização glútea",
+    legenda: "Projeção e sustentação — resultado real",
   },
   {
-    src: "/resultados/lipo_antes.png",
-    fase: "Antes",
-    titulo: "Lipo enzimática",
-    legenda: "Antes do procedimento",
-  },
-  {
-    src: "/resultados/lipo_depois.png",
-    fase: "Depois",
-    titulo: "Lipo enzimática",
+    src: "/resultados/lipo_enzimatica.png",
+    titulo: "Lipoenzimática",
     legenda: "Redução de gordura localizada sem cirurgia",
   },
   {
-    src: "/resultados/gluteo_antes.png",
-    fase: "Antes",
-    titulo: "Harmonização glútea",
-    legenda: "Antes do procedimento",
-  },
-  {
-    src: "/resultados/gluteo_depois.png",
-    fase: "Depois",
-    titulo: "Harmonização glútea",
-    legenda: "Projeção e sustentação — resultado natural",
-  },
-  {
-    src: "/resultados/depoimento1_antes.jpeg",
-    fase: "Antes",
-    titulo: "Harmonização labial",
-    legenda: "Antes do procedimento — registro inicial",
-  },
-  {
-    src: "/resultados/depoimento1_depois.jpeg",
-    fase: "Depois",
-    titulo: "Harmonização labial",
-    legenda: "Volume e contorno natural — resultado final",
-  },
-  {
-    src: "/resultados/depoimento2_gluteos.jpeg",
-    titulo: "Harmonização glútea · depoimento real",
-    legenda: "Projeção e sustentação — transformação acompanhada",
-  },
-  {
-    src: "/resultados/depoimento3_lipo.jpeg",
-    titulo: "Lipo enzimática · depoimento real",
-    legenda: "Redução de gordura localizada sem cirurgia",
-  },
-  {
-    src: "/resultados/depoimento4.jpeg",
-    titulo: "Resultado real",
-    legenda: "Transformação acompanhada pelo Dr. Higor",
+    src: "/resultados/skinboost.png",
+    titulo: "Skinbooster",
+    legenda: "Qualidade de pele — uniformidade e viço",
   },
 ];
 
