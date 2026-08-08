@@ -18,6 +18,7 @@ import {
   Gem,
   Instagram,
   Layers,
+  Loader2,
   Mail,
   MapPin,
   Menu,
@@ -983,66 +984,163 @@ function Services() {
 /*  Resultados — Prova Social                                          */
 /* ------------------------------------------------------------------ */
 
-const ANTES_DEPOIS_SLIDES = [
+const RESULTADOS_IMAGENS: {
+  src: string;
+  fase?: "Antes" | "Depois";
+  titulo: string;
+  legenda: string;
+}[] = [
   {
-    id: 1,
-    antes: "/resultados/facial_antes.png",
-    depois: "/resultados/facial_depois.png",
+    src: "/resultados/facial_antes.png",
+    fase: "Antes",
+    titulo: "Skinbooster · qualidade de pele",
+    legenda: "Ponto de partida — textura e viço iniciais",
+  },
+  {
+    src: "/resultados/facial_depois.png",
+    fase: "Depois",
     titulo: "Skinbooster · qualidade de pele",
     legenda: "Pele uniforme e luminosa — protocolo facial",
   },
   {
-    id: 2,
-    antes: "/resultados/labial_antes.png",
-    depois: "/resultados/labial_antes.png", // TODO: substituir por labial_depois.png quando disponível
+    src: "/resultados/labial_antes.png",
+    fase: "Antes",
+    titulo: "Harmonização labial",
+    legenda: "Antes do procedimento",
+  },
+  {
+    src: "/resultados/labial_depois.png",
+    fase: "Depois",
     titulo: "Harmonização labial",
     legenda: "Volume e contorno natural",
   },
   {
-    id: 3,
-    antes: "/resultados/lipo_antes.png",
-    depois: "/resultados/lipo_depois.png",
+    src: "/resultados/lipo_antes.png",
+    fase: "Antes",
+    titulo: "Lipo enzimática",
+    legenda: "Antes do procedimento",
+  },
+  {
+    src: "/resultados/lipo_depois.png",
+    fase: "Depois",
     titulo: "Lipo enzimática",
     legenda: "Redução de gordura localizada sem cirurgia",
   },
   {
-    id: 4,
-    antes: "/resultados/gluteo_antes.png",
-    depois: "/resultados/gluteo_depois.png",
+    src: "/resultados/gluteo_antes.png",
+    fase: "Antes",
+    titulo: "Harmonização glútea",
+    legenda: "Antes do procedimento",
+  },
+  {
+    src: "/resultados/gluteo_depois.png",
+    fase: "Depois",
     titulo: "Harmonização glútea",
     legenda: "Projeção e sustentação — resultado natural",
   },
+  {
+    src: "/resultados/depoimento1_antes.jpeg",
+    fase: "Antes",
+    titulo: "Depoimento real · acompanhamento completo",
+    legenda: "Registro inicial do acompanhamento",
+  },
+  {
+    src: "/resultados/depoimento1_depois.jpeg",
+    fase: "Depois",
+    titulo: "Depoimento real · acompanhamento completo",
+    legenda: "Evolução registrada após o protocolo",
+  },
+  {
+    src: "/resultados/depoimento2_gluteos.jpeg",
+    titulo: "Harmonização glútea · depoimento real",
+    legenda: "Projeção e sustentação — transformação acompanhada",
+  },
+  {
+    src: "/resultados/depoimento3_lipo.jpeg",
+    titulo: "Lipo enzimática · depoimento real",
+    legenda: "Redução de gordura localizada sem cirurgia",
+  },
+  {
+    src: "/resultados/depoimento4.jpeg",
+    titulo: "Resultado real",
+    legenda: "Transformação acompanhada pelo Dr. Higor",
+  },
 ];
 
+/**
+ * Carrossel de resultados — uma foto por vez, com badge Antes/Depois,
+ * setas sobrepostas, indicadores e rotação automática. Fotos que ainda
+ * não existem em public/ (ex.: labial_depois.png) são detectadas e ficam
+ * de fora do carrossel até serem adicionadas.
+ */
 function ResultadosCarrossel() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [slides, setSlides] = useState<typeof RESULTADOS_IMAGENS | null>(null);
   const reduceMotion = useReducedMotion();
+
+  // Descobre quais fotos existem de verdade (ex.: labial_depois.png pode
+  // ainda não ter sido enviado) para não exibir imagem quebrada.
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(
+      RESULTADOS_IMAGENS.map(
+        (item) =>
+          new Promise<boolean>((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve(true);
+            img.onerror = () => resolve(false);
+            img.src = item.src;
+          }),
+      ),
+    ).then((available) => {
+      if (cancelled) return;
+      setSlides(RESULTADOS_IMAGENS.filter((_, index) => available[index]));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const total = slides?.length ?? 0;
 
   // Auto-rotação a cada 5 segundos
   useEffect(() => {
-    if (isPaused || reduceMotion) return;
+    if (isPaused || reduceMotion || total === 0) return;
     const interval = setInterval(() => {
-      setActiveSlide((current) => (current + 1) % ANTES_DEPOIS_SLIDES.length);
+      setActiveSlide((current) => (current + 1) % total);
     }, 5000);
     return () => clearInterval(interval);
-  }, [isPaused, reduceMotion]);
+  }, [isPaused, reduceMotion, total]);
+
+  // Mantém o índice válido se a lista de fotos encolher
+  useEffect(() => {
+    if (total > 0 && activeSlide >= total) setActiveSlide(0);
+  }, [activeSlide, total]);
 
   const goToSlide = (index: number) => {
     setActiveSlide(index);
   };
 
   const goToPrevious = () => {
-    setActiveSlide((current) =>
-      current === 0 ? ANTES_DEPOIS_SLIDES.length - 1 : current - 1
-    );
+    setActiveSlide((current) => (current === 0 ? total - 1 : current - 1));
   };
 
   const goToNext = () => {
-    setActiveSlide((current) => (current + 1) % ANTES_DEPOIS_SLIDES.length);
+    setActiveSlide((current) => (current + 1) % total);
   };
 
-  const currentSlide = ANTES_DEPOIS_SLIDES[activeSlide];
+  if (!slides) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center rounded-2xl border border-brown/10 bg-beige">
+        <Loader2 className="size-6 animate-spin text-brown/40" />
+      </div>
+    );
+  }
+
+  if (slides.length === 0) return null;
+
+  const currentSlide = slides[activeSlide];
 
   return (
     <div
@@ -1052,48 +1150,59 @@ function ResultadosCarrossel() {
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
     >
-      {/* Container do carrossel */}
-      <div className="relative overflow-hidden rounded-2xl">
+      {/* Moldura do carrossel */}
+      <div className="relative overflow-hidden rounded-[1.5rem] border border-brown/10 bg-beige">
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeSlide}
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 100 }}
+            key={currentSlide.src}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 90 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -100 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="grid gap-5 md:grid-cols-2"
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -90 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex w-full items-center justify-center bg-beige"
             aria-live="polite"
           >
-            {/* Card ANTES */}
-            <div className="flex flex-col">
-              <img
-                src={currentSlide.antes}
-                alt={`Antes - ${currentSlide.titulo}`}
-                loading="lazy"
-                className="h-auto w-full rounded-2xl object-cover shadow-[0_10px_40px_-12px_rgb(107_83_68_/_0.3)]"
-              />
-            </div>
+            <img
+              src={currentSlide.src}
+              alt={
+                currentSlide.fase
+                  ? `${currentSlide.fase} - ${currentSlide.titulo}`
+                  : currentSlide.titulo
+              }
+              loading="lazy"
+              className="max-h-[72vh] w-auto max-w-full object-contain"
+            />
 
-            {/* Card DEPOIS */}
-            <div className="flex flex-col">
-              <img
-                src={currentSlide.depois}
-                alt={`Depois - ${currentSlide.titulo}`}
-                loading="lazy"
-                className="h-auto w-full rounded-2xl object-cover shadow-[0_10px_40px_-12px_rgb(107_83_68_/_0.3)]"
-              />
+            {/* Badge Antes/Depois (apenas quando a fase é conhecida) */}
+            {currentSlide.fase && (
+              <span
+                className={cn(
+                  "absolute left-4 top-4 rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]",
+                  currentSlide.fase === "Depois"
+                    ? "bg-gold text-brown-deep"
+                    : "border border-terracotta/30 bg-peach/95 text-terracotta",
+                )}
+              >
+                {currentSlide.fase}
+              </span>
+            )}
+
+            {/* Título e legenda sobre gradiente */}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brown-deep/95 via-brown-deep/45 to-transparent px-6 pb-6 pt-20">
+              <h4 className="text-lg font-semibold tracking-tight text-cream">
+                {currentSlide.titulo}
+              </h4>
+              <p className="mt-1 text-sm text-cream/75">{currentSlide.legenda}</p>
             </div>
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      {/* Setas de navegação */}
-      <div className="mt-6 flex items-center justify-center gap-4">
+        {/* Setas sobrepostas */}
         <button
           type="button"
           onClick={goToPrevious}
-          aria-label="Slide anterior"
-          className="flex size-10 items-center justify-center rounded-full border border-brown/20 bg-cream text-brown transition-all hover:border-gold hover:bg-gold hover:text-brown-deep"
+          aria-label="Foto anterior"
+          className="absolute left-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-brown/15 bg-cream/90 text-brown backdrop-blur-md transition-all hover:border-gold hover:bg-gold hover:text-brown-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
         >
           <svg
             className="size-5"
@@ -1110,30 +1219,11 @@ function ResultadosCarrossel() {
           </svg>
         </button>
 
-        {/* Dots indicadores */}
-        <div className="flex items-center gap-2">
-          {ANTES_DEPOIS_SLIDES.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => goToSlide(index)}
-              aria-label={`Ir para slide ${index + 1}`}
-              aria-current={activeSlide === index ? "true" : undefined}
-              className={cn(
-                "h-2 rounded-full transition-all duration-300",
-                activeSlide === index
-                  ? "w-8 bg-gold"
-                  : "w-2 bg-brown/20 hover:bg-brown/40"
-              )}
-            />
-          ))}
-        </div>
-
         <button
           type="button"
           onClick={goToNext}
-          aria-label="Próximo slide"
-          className="flex size-10 items-center justify-center rounded-full border border-brown/20 bg-cream text-brown transition-all hover:border-gold hover:bg-gold hover:text-brown-deep"
+          aria-label="Próxima foto"
+          className="absolute right-3 top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-brown/15 bg-cream/90 text-brown backdrop-blur-md transition-all hover:border-gold hover:bg-gold hover:text-brown-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
         >
           <svg
             className="size-5"
@@ -1151,12 +1241,32 @@ function ResultadosCarrossel() {
         </button>
       </div>
 
-      {/* Título e legenda do slide atual */}
-      <div className="mt-6 text-center">
-        <h4 className="text-lg font-semibold tracking-tight text-brown">
-          {currentSlide.titulo}
-        </h4>
-        <p className="mt-1.5 text-sm text-brown/60">{currentSlide.legenda}</p>
+      {/* Indicadores + contador */}
+      <div className="mt-6 flex items-center justify-center gap-4">
+        <div className="flex items-center gap-2">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.src}
+              type="button"
+              onClick={() => goToSlide(index)}
+              aria-label={
+                slide.fase
+                  ? `Ir para foto ${index + 1}: ${slide.fase} ${slide.titulo}`
+                  : `Ir para foto ${index + 1}: ${slide.titulo}`
+              }
+              aria-current={activeSlide === index ? "true" : undefined}
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                activeSlide === index
+                  ? "w-8 bg-gold"
+                  : "w-2 bg-brown/20 hover:bg-brown/40"
+              )}
+            />
+          ))}
+        </div>
+        <span className="text-xs font-medium tabular-nums text-brown/45">
+          {activeSlide + 1} / {slides.length}
+        </span>
       </div>
 
       {/* Aviso de autorização */}
